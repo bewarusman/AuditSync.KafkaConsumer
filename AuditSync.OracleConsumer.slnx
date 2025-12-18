@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="architecture.md" />
+    <File Path="data.md" />
+    <File Path="plan.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/AuditSync.OracleConsumer.App/AuditSync.OracleConsumer.App.csproj" Id="bbfbea89-fffd-4de4-9a20-8486c3fb2acc" />
+    <Project Path="src/AuditSync.OracleConsumer.Application/AuditSync.OracleConsumer.Application.csproj" Id="e0850dda-cb40-45d2-a609-78c21ee197fe" />
+    <Project Path="src/AuditSync.OracleConsumer.Domain/AuditSync.OracleConsumer.Domain.csproj" Id="b1c5dcd6-688e-4f61-b6a2-7ad3b8e36905" />
+    <Project Path="src/AuditSync.OracleConsumer.Infrastructure/AuditSync.OracleConsumer.Infrastructure.csproj" Id="9974b657-d3cd-4e0b-9b2c-61b238d7161a" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AuditSync.OracleConsumer.Test.Integration/AuditSync.OracleConsumer.Test.Integration.csproj" Id="27a187d3-4ffb-4d93-98ca-40cb0e3ece5b" />
+    <Project Path="tests/AuditSync.OracleConsumer.Test.Unit/AuditSync.OracleConsumer.Test.Unit.csproj" Id="b7e1fc1f-caf1-4086-a202-14522db7e26d" />
+  </Folder>
+</Solution>
