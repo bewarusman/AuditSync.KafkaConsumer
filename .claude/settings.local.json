@@ -6,7 +6,12 @@
       "Bash(dotnet restore:*)",
       "Bash(dotnet build:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(dotnet run:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd.exe //C \"taskkill //F //PID 34236\")",
+      "Bash(powershell -Command \"Stop-Process -Id 34236 -Force\")",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

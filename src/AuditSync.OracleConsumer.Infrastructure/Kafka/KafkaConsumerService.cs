@@ -10,6 +10,7 @@ public class KafkaConsumerService : IDisposable
 {
     private readonly IConsumer<string, string> _consumer;
     private readonly ILogger<KafkaConsumerService> _logger;
+    private bool _disposed = false;
 
     public KafkaConsumerService(IConsumer<string, string> consumer, ILogger<KafkaConsumerService> logger)
     {
@@ -44,7 +45,22 @@ public class KafkaConsumerService : IDisposable
 
     public void Dispose()
     {
-        _consumer?.Close();
-        _consumer?.Dispose();
+        if (_disposed)
+            return;
+
+        try
+        {
+            _consumer?.Close();
+            _consumer?.Dispose();
+            _logger.LogInformation("Kafka consumer closed and disposed successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error during Kafka consumer disposal");
+        }
+        finally
+        {
+            _disposed = true;
+        }
     }
 }

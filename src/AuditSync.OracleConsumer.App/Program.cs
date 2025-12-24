@@ -35,7 +35,7 @@ var kafkaConfig = new ConsumerConfig
     BootstrapServers = Environment.GetEnvironmentVariable("KAFKA_BOOTSTRAP_SERVERS") ?? "localhost:9092",
     GroupId = Environment.GetEnvironmentVariable("KAFKA_GROUP_ID") ?? "auditsync-consumer-group",
     AutoOffsetReset = Enum.Parse<AutoOffsetReset>(
-        Environment.GetEnvironmentVariable("KAFKA_AUTO_OFFSET_RESET") ?? "Earliest"),
+        Environment.GetEnvironmentVariable("KAFKA_AUTO_OFFSET_RESET") ?? "Earliest", ignoreCase: true),
     EnableAutoCommit = bool.Parse(
         Environment.GetEnvironmentVariable("KAFKA_ENABLE_AUTO_COMMIT") ?? "false"),
     SessionTimeoutMs = int.Parse(
@@ -72,10 +72,31 @@ builder.Services.AddSingleton<IExtractedValuesRepository>(sp =>
     return new ExtractedValuesRepository(oracleConnectionString, logger);
 });
 
+builder.Services.AddSingleton<ITargetRepository>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<TargetRepository>>();
+    return new TargetRepository(oracleConnectionString, logger);
+});
+
+// Register Case Repositories
+builder.Services.AddSingleton<ICaseRepository>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<CaseRepository>>();
+    return new CaseRepository(oracleConnectionString, logger);
+});
+
+builder.Services.AddSingleton<ICaseExtractionRepository>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<CaseExtractionRepository>>();
+    return new CaseExtractionRepository(oracleConnectionString, logger);
+});
+
 // Register Services
 builder.Services.AddSingleton<IRuleEngine, RegexRuleEngine>();
 builder.Services.AddSingleton<IAuditDataService, AuditDataService>();
 builder.Services.AddSingleton<IOffsetManager, OffsetManager>();
+builder.Services.AddSingleton<IExtractionService, ExtractionService>();
+builder.Services.AddSingleton<ICaseService, CaseService>();
 
 // Register Background Service
 builder.Services.AddHostedService<AuditConsumerBackgroundService>();

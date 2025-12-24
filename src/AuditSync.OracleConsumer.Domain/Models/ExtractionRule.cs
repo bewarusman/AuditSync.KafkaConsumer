@@ -26,12 +26,6 @@ public class ExtractionRule
     /// </summary>
     public string RegexPattern { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Indicates whether this rule must match for processing to succeed.
-    /// If true and the rule fails to match, an exception is thrown.
-    /// </summary>
-    public bool IsRequired { get; set; }
-
     public bool IsActive { get; set; }
     public int RuleOrder { get; set; }
 }

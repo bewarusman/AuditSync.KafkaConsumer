@@ -58,14 +58,9 @@ public class RegexRuleEngine : IRuleEngine
                 _logger.LogDebug("Rule '{RuleName}' extracted value: {Value}",
                     rule.RuleName, match.Groups[1].Value);
             }
-            else if (rule.IsRequired)
-            {
-                throw new RuleValidationException(
-                    $"Required rule '{rule.RuleName}' failed to match for target '{message.Target}'");
-            }
             else
             {
-                _logger.LogDebug("Optional rule '{RuleName}' did not match", rule.RuleName);
+                _logger.LogDebug("Rule '{RuleName}' did not match", rule.RuleName);
             }
         }
 

@@ -30,7 +30,7 @@ public class RuleRepository : IRuleRepository
             var sql = @"
                 SELECT r.ID, r.TARGET_ID AS TargetId, t.NAME AS TargetName, r.RULE_NAME AS RuleName,
                        r.SOURCE_FIELD AS SourceField, r.REGEX_PATTERN AS RegexPattern,
-                       r.IS_REQUIRED AS IsRequired, r.IS_ACTIVE AS IsActive, r.RULE_ORDER AS RuleOrder
+                       r.IS_ACTIVE AS IsActive, r.RULE_ORDER AS RuleOrder
                 FROM target_rules r
                 INNER JOIN targets t ON r.TARGET_ID = t.ID
                 WHERE t.NAME = :TargetName

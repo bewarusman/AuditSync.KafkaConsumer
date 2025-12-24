@@ -18,7 +18,6 @@ public class ExtractionRuleTests
             RuleName = "MSISDN",
             SourceField = "sqlText",
             RegexPattern = @"MSISDN=:(\w+)",
-            IsRequired = false,
             IsActive = true,
             RuleOrder = 1
         };
@@ -30,19 +29,8 @@ public class ExtractionRuleTests
         rule.RuleName.Should().Be("MSISDN");
         rule.SourceField.Should().Be("sqlText");
         rule.RegexPattern.Should().Be(@"MSISDN=:(\w+)");
-        rule.IsRequired.Should().BeFalse();
         rule.IsActive.Should().BeTrue();
         rule.RuleOrder.Should().Be(1);
-    }
-
-    [Fact]
-    public void ExtractionRule_IsRequired_DefaultsToFalse()
-    {
-        // Arrange & Act
-        var rule = new ExtractionRule();
-
-        // Assert
-        rule.IsRequired.Should().BeFalse();
     }
 
     [Fact]

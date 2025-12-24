@@ -26,7 +26,6 @@ public class RuleRepositoryIntegrationTests : DatabaseIntegrationTestBase
         rules[0].RuleName.Should().Be("TABLE_NAME");
         rules[0].SourceField.Should().Be("name");
         rules[0].RegexPattern.Should().Be("^(\\w+)$");
-        rules[0].IsRequired.Should().BeTrue();
         rules[0].IsActive.Should().BeTrue();
         rules[0].RuleOrder.Should().Be(1);
 
@@ -118,20 +117,20 @@ public class RuleRepositoryIntegrationTests : DatabaseIntegrationTestBase
         // Insert rules
         using var ruleCmd1 = connection.CreateCommand();
         ruleCmd1.CommandText = @"
-            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_REQUIRED, IS_ACTIVE, RULE_ORDER)
-            VALUES ('rule-1', 'target-1', 'TABLE_NAME', 'name', '^(\w+)$', 1, 1, 1)";
+            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_ACTIVE, RULE_ORDER)
+            VALUES ('rule-1', 'target-1', 'TABLE_NAME', 'name', '^(\w+)$', 1, 1)";
         await ruleCmd1.ExecuteNonQueryAsync();
 
         using var ruleCmd2 = connection.CreateCommand();
         ruleCmd2.CommandText = @"
-            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_REQUIRED, IS_ACTIVE, RULE_ORDER)
-            VALUES ('rule-2', 'target-1', 'SCHEMA', 'owner', '^(\w+)$', 1, 1, 2)";
+            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_ACTIVE, RULE_ORDER)
+            VALUES ('rule-2', 'target-1', 'SCHEMA', 'owner', '^(\w+)$', 1, 2)";
         await ruleCmd2.ExecuteNonQueryAsync();
 
         using var ruleCmd3 = connection.CreateCommand();
         ruleCmd3.CommandText = @"
-            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_REQUIRED, IS_ACTIVE, RULE_ORDER)
-            VALUES ('rule-3', 'target-1', 'MSISDN', 'sqlText', 'MSISDN=:(\\w+)', 0, 1, 3)";
+            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_ACTIVE, RULE_ORDER)
+            VALUES ('rule-3', 'target-1', 'MSISDN', 'sqlText', 'MSISDN=:(\\w+)', 1, 3)";
         await ruleCmd3.ExecuteNonQueryAsync();
     }
 
@@ -150,22 +149,22 @@ public class RuleRepositoryIntegrationTests : DatabaseIntegrationTestBase
         // Insert active rule 1
         using var ruleCmd1 = connection.CreateCommand();
         ruleCmd1.CommandText = @"
-            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_REQUIRED, IS_ACTIVE, RULE_ORDER)
-            VALUES ('rule-4', 'target-2', 'ACTIVE_RULE_1', 'name', 'test', 0, 1, 1)";
+            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_ACTIVE, RULE_ORDER)
+            VALUES ('rule-4', 'target-2', 'ACTIVE_RULE_1', 'name', 'test', 1, 1)";
         await ruleCmd1.ExecuteNonQueryAsync();
 
         // Insert inactive rule
         using var ruleCmd2 = connection.CreateCommand();
         ruleCmd2.CommandText = @"
-            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_REQUIRED, IS_ACTIVE, RULE_ORDER)
-            VALUES ('rule-5', 'target-2', 'INACTIVE_RULE', 'name', 'test', 0, 0, 2)";
+            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_ACTIVE, RULE_ORDER)
+            VALUES ('rule-5', 'target-2', 'INACTIVE_RULE', 'name', 'test', 0, 2)";
         await ruleCmd2.ExecuteNonQueryAsync();
 
         // Insert active rule 2
         using var ruleCmd3 = connection.CreateCommand();
         ruleCmd3.CommandText = @"
-            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_REQUIRED, IS_ACTIVE, RULE_ORDER)
-            VALUES ('rule-6', 'target-2', 'ACTIVE_RULE_2', 'owner', 'test', 0, 1, 3)";
+            INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_ACTIVE, RULE_ORDER)
+            VALUES ('rule-6', 'target-2', 'ACTIVE_RULE_2', 'owner', 'test', 1, 3)";
         await ruleCmd3.ExecuteNonQueryAsync();
     }
 
@@ -188,8 +187,8 @@ public class RuleRepositoryIntegrationTests : DatabaseIntegrationTestBase
         {
             using var ruleCmd = connection.CreateCommand();
             ruleCmd.CommandText = @"
-                INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_REQUIRED, IS_ACTIVE, RULE_ORDER)
-                VALUES (:Id, 'target-3', :Name, 'name', 'test', 0, 1, :Order)";
+                INSERT INTO target_rules (ID, TARGET_ID, RULE_NAME, SOURCE_FIELD, REGEX_PATTERN, IS_ACTIVE, RULE_ORDER)
+                VALUES (:Id, 'target-3', :Name, 'name', 'test', 1, :Order)";
             ruleCmd.Parameters.Add("Id", $"rule-order-{order}");
             ruleCmd.Parameters.Add("Name", name);
             ruleCmd.Parameters.Add("Order", order);

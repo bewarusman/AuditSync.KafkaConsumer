@@ -43,15 +43,13 @@ public class RegexRuleEngineTests
             {
                 RuleName = "MSISDN",
                 SourceField = "bindVariables",
-                RegexPattern = @"#1\(\d+\):(\d+)",
-                IsRequired = false
+                RegexPattern = @"#1\(\d+\):(\d+)"
             },
             new ExtractionRule
             {
                 RuleName = "STATUS_ID",
                 SourceField = "sqlText",
-                RegexPattern = @"STATUS_ID=(\d+)",
-                IsRequired = false
+                RegexPattern = @"STATUS_ID=(\d+)"
             }
         };
 
@@ -69,41 +67,6 @@ public class RegexRuleEngineTests
         result.ExtractedFields.Should().HaveCount(2);
         result.ExtractedFields["MSISDN"].Should().Be("9647515364803");
         result.ExtractedFields["STATUS_ID"].Should().Be("1");
-    }
-
-    [Fact]
-    public async Task ApplyRulesAsync_ShouldThrowException_WhenRequiredRuleFails()
-    {
-        // Arrange
-        var message = new AuditMessage
-        {
-            Id = "test-id",
-            Target = "Production Oracle Database",
-            Owner = "TESTOWNER",
-            Name = "TESTTABLE",
-            SqlText = "SELECT * FROM TABLE"
-        };
-
-        var rules = new List<ExtractionRule>
-        {
-            new ExtractionRule
-            {
-                RuleName = "REQUIRED_FIELD",
-                SourceField = "sqlText",
-                RegexPattern = @"NONEXISTENT=(\w+)",
-                IsRequired = true
-            }
-        };
-
-        _ruleRepositoryMock.Setup(r => r.GetRulesByTargetAsync("Production Oracle Database"))
-            .ReturnsAsync(rules);
-
-        // Act
-        Func<Task> act = async () => await _ruleEngine.ApplyRulesAsync(message);
-
-        // Assert
-        await act.Should().ThrowAsync<RuleValidationException>()
-            .WithMessage("*Required rule*REQUIRED_FIELD*failed*");
     }
 
     [Fact]
@@ -125,8 +88,7 @@ public class RegexRuleEngineTests
             {
                 RuleName = "OPTIONAL_FIELD",
                 SourceField = "sqlText",
-                RegexPattern = @"NONEXISTENT=(\w+)",
-                IsRequired = false
+                RegexPattern = @"NONEXISTENT=(\w+)"
             }
         };
 
@@ -160,8 +122,7 @@ public class RegexRuleEngineTests
             {
                 RuleName = "MSISDN",
                 SourceField = "sqlText",
-                RegexPattern = @"MSISDN=:(\w+)",
-                IsRequired = false
+                RegexPattern = @"MSISDN=:(\w+)"
             }
         };
 
@@ -222,11 +183,11 @@ public class RegexRuleEngineTests
 
         var rules = new List<ExtractionRule>
         {
-            new ExtractionRule { RuleName = "OWNER", SourceField = "owner", RegexPattern = @"^(\w+)$", IsRequired = false },
-            new ExtractionRule { RuleName = "NAME", SourceField = "name", RegexPattern = @"^(\w+)$", IsRequired = false },
-            new ExtractionRule { RuleName = "TEXT_MATCH", SourceField = "sqlText", RegexPattern = @"FROM (\w+)", IsRequired = false },
-            new ExtractionRule { RuleName = "BIND_VALUE", SourceField = "bindVariables", RegexPattern = @":(\w+)", IsRequired = false },
-            new ExtractionRule { RuleName = "DB_USER", SourceField = "dbUser", RegexPattern = @"^(\w+)$", IsRequired = false }
+            new ExtractionRule { RuleName = "OWNER", SourceField = "owner", RegexPattern = @"^(\w+)$" },
+            new ExtractionRule { RuleName = "NAME", SourceField = "name", RegexPattern = @"^(\w+)$" },
+            new ExtractionRule { RuleName = "TEXT_MATCH", SourceField = "sqlText", RegexPattern = @"FROM (\w+)" },
+            new ExtractionRule { RuleName = "BIND_VALUE", SourceField = "bindVariables", RegexPattern = @":(\w+)" },
+            new ExtractionRule { RuleName = "DB_USER", SourceField = "dbUser", RegexPattern = @"^(\w+)$" }
         };
 
         _ruleRepositoryMock.Setup(r => r.GetRulesByTargetAsync("Production Oracle Database"))
@@ -263,8 +224,7 @@ public class RegexRuleEngineTests
             {
                 RuleName = "PRIVILEGE",
                 SourceField = "privilegeUsed",
-                RegexPattern = @"(\w+)",
-                IsRequired = false
+                RegexPattern = @"(\w+)"
             }
         };
 
