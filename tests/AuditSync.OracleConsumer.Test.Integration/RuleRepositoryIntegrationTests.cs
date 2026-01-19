@@ -1,3 +1,4 @@
+using AuditSync.OracleConsumer.Domain.Models;
 using AuditSync.OracleConsumer.Infrastructure.Repositories;
 using FluentAssertions;
 using Oracle.ManagedDataAccess.Client;
@@ -24,17 +25,16 @@ public class RuleRepositoryIntegrationTests : DatabaseIntegrationTestBase
 
         // Verify rules are ordered by RULE_ORDER
         rules[0].RuleName.Should().Be("TABLE_NAME");
-        rules[0].SourceField.Should().Be("name");
+        rules[0].SourceField.Should().Be("name".ToSourceFieldType());
         rules[0].RegexPattern.Should().Be("^(\\w+)$");
-        rules[0].IsActive.Should().BeTrue();
         rules[0].RuleOrder.Should().Be(1);
 
         rules[1].RuleName.Should().Be("SCHEMA");
-        rules[1].SourceField.Should().Be("owner");
+        rules[1].SourceField.Should().Be("owner".ToSourceFieldType());
         rules[1].RuleOrder.Should().Be(2);
 
         rules[2].RuleName.Should().Be("MSISDN");
-        rules[2].SourceField.Should().Be("sqlText");
+        rules[2].SourceField.Should().Be("sqlText".ToSourceFieldType());
         rules[2].RuleOrder.Should().Be(3);
     }
 
@@ -66,7 +66,6 @@ public class RuleRepositoryIntegrationTests : DatabaseIntegrationTestBase
         // Assert
         rules.Should().NotBeNull();
         rules.Should().HaveCount(2); // Only 2 active rules
-        rules.Should().AllSatisfy(r => r.IsActive.Should().BeTrue());
     }
 
     [Fact]

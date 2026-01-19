@@ -22,37 +22,81 @@ The consumer is designed to:
 └────────┬────────┘
          │
          ▼
-┌─────────────────────────┐
-│   AuditSync Consumer    │
-│  ┌──────────────────┐   │
-│  │ Message Consumer │   │
-│  └────────┬─────────┘   │
-│           │             │
-│           ▼             │
-│  ┌──────────────────┐   │
-│  │   Rule Engine    │   │
-│  │  (Regex Extract) │   │
-│  └────────┬─────────┘   │
-│           │             │
-│           ▼             │
+┌──────────────────────────┐
+│   AuditSync Consumer     │
+│  ┌───────────────────┐   │
+│  │ Message Consumer  │   │
+│  └─────────┬─────────┘   │
+│            │             │
+│            ▼             │
+│  ┌───────────────────┐   │
+│  │ Oracle Persist    │   │
+│  │ (audit_logs)      │   │
+│  └─────────┬─────────┘   │
+│            │             │
+│            ▼             │
+│  ┌───────────────────┐   │
+│  │ Extraction Engine │   │
+│  │ (Regex Matching)  │   │
+│  └─────────┬─────────┘   │
+│            │             │
+│       Any Match?         │
+│         │     │          │
+│        Yes    No         │
+│         │     └─────┐    │
+│         ▼           │    │
+│  ┌───────────────┐  │    │
+│  │ Case Service  │  │    │
+│  │ (Create Case) │  │    │
+│  └─────────┬─────┘  │    │
+│            │        │    │
+│            ▼        │    │
 │  ┌──────────────────┐   │
 │  │ Oracle Persist   │   │
-│  │   (Dapper)       │   │
+│  │ (cases +         │◄──┘
+│  │  extractions)    │   │
 │  └────────┬─────────┘   │
 └───────────┼─────────────┘
             │
             ▼
-┌─────────────────────────┐
-│   Oracle Database       │
-│  ┌──────────────────┐   │
-│  │   audit_logs     │   │
-│  └──────────────────┘   │
-│  ┌──────────────────┐   │
-│  │ audit_log_       │   │
-│  │ extracted_values │   │
-│  └──────────────────┘   │
-└─────────────────────────┘
+┌────────────────────────────┐
+│   Oracle Database          │
+│  ┌──────────────────────┐  │
+│  │   audit_logs         │  │
+│  │ (All audit messages) │  │
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │   targets            │  │
+│  │ (Target databases)   │  │
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │   target_rules       │  │
+│  │ (Extraction rules)   │  │
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │   cases              │  │
+│  │ (When extraction OK) │  │
+│  └──────────────────────┘  │
+│  ┌──────────────────────┐  │
+│  │  case_extractions    │  │
+│  │ (Extracted values +  │  │
+│  │  rule information)   │  │
+│  └──────────────────────┘  │
+└────────────────────────────┘
 ```
+
+## Case-Based Processing
+
+The consumer implements an intelligent case-based system:
+
+- **All audit messages** are stored in the `audit_logs` table
+- **Extraction rules** (regex patterns) are applied to extract sensitive data (e.g., MSISDNs, IMSIs)
+- **Cases are created** only when ANY extraction rule successfully matches
+- **No case is created** if no rules match (reduces noise)
+- **One case per audit log** (enforced by unique constraint)
+- **Complete audit trail**: Each extraction stores the rule name, regex pattern, and source field that matched
+
+This approach ensures that only relevant audit logs with extracted sensitive data generate cases for investigation.
 
 ## Core Principles
 
@@ -79,11 +123,14 @@ The consumer is designed to:
 
 1. **Consume**: Poll Kafka topic for new audit messages
 2. **Deserialize**: Convert JSON to domain objects (22 properties)
-3. **Extract**: Apply regex rules to extract relevant fields
-4. **Persist**: Save to two Oracle tables:
-   - `audit_logs`: Complete audit record
-   - `audit_log_extracted_values`: Extracted field/value pairs
-5. **Commit**: Commit Kafka offset only after successful database write
+3. **Persist Audit Log**: Save complete message to `audit_logs` table (MERGE/upsert)
+4. **Load Rules**: Fetch extraction rules for the target from `target_rules` table
+5. **Extract**: Apply regex rules to extract values from audit message fields
+6. **Create Case** (conditional):
+   - **If ANY extraction succeeds**: Create case in `cases` table
+   - **Store extractions**: Save to `case_extractions` with denormalized rule info
+   - **If NO extractions**: Skip to next message (no case created)
+7. **Commit**: Commit Kafka offset only after successful database write
 
 ## Key Features
 
@@ -102,6 +149,14 @@ The consumer is designed to:
 - Minimal database queries for optimal performance
 - Rules can be updated without redeploying the application
 
+### ✅ Case-Based Processing
+- **Intelligent Case Creation**: Cases created only when extraction rules successfully extract values
+- **No Noise**: Audit logs with no extracted values don't create cases (reduces noise)
+- **Complete Audit Trail**: Each extraction records which rule matched and the exact regex pattern used
+- **Denormalized Rule Info**: Case extractions store rule name, pattern, and source field for historical reference
+- **Idempotent**: Reprocessing same audit log won't create duplicate cases
+- **One Case Per Audit**: Enforced by unique constraint on AUDIT_LOG_ID
+
 ### ✅ Robust Error Handling
 - Retry logic with exponential backoff
 - Comprehensive logging for troubleshooting
@@ -117,13 +172,22 @@ The consumer is designed to:
 Configuration is managed through:
 - **`.env` File**: Kafka settings, Oracle connection details, processing options
 - **Database Tables**:
+  - **`audit_logs`**: Store all audit messages from Kafka (with deduplication via MERGE)
   - **`targets`**: Store target database information (ID, NAME, DESCRIPTION)
   - **`target_rules`**: Extraction rules per target (linked via foreign key)
     - Different targets can have different extraction rules
     - Rules loaded lazily on first use and cached in memory
     - Minimal database queries - only when rule not in cache
     - Rules can be added, updated, or deactivated without code changes
-    - Supports rule ordering and required/optional flags
+    - Supports rule ordering and active/inactive flags
+  - **`cases`**: Store cases created when extraction succeeds
+    - One case per audit_log (unique constraint)
+    - Case status: OPEN, RESOLVED, ASSIGNED
+    - VALID field for manual validation (YES, NO, NULL)
+  - **`case_extractions`**: Store extracted values with rule information
+    - Denormalized rule data (RULE_NAME, REGEX_PATTERN, SOURCE_FIELD)
+    - Complete audit trail of which rule extracted which value
+    - Linked to cases, audit_logs, and target_rules
 
 ## Scalability
 
@@ -142,11 +206,14 @@ Configuration is managed through:
 ---
 
 **For detailed implementation, see:**
-- **[architecture.md](architecture.md)** - Detailed architecture, code examples, and configuration
-- **[plan.md](plan.md)** - Implementation tasks and phases
-- **[data.md](data.md)** - Sample data transformations
+- **[architecture.md](docs/architecture.md)** - Detailed architecture, code examples, and configuration
+- **[plan.md](docs/plan.md)** - Implementation tasks and phases
+- **[data.md](docs/data.md)** - Database schema, sample data, and queries
+- **[case_plan.md](docs/case_plan.md)** - Case-based architecture design and rationale
+- **[DATABASE_SETUP.md](docs/DATABASE_SETUP.md)** - Database setup guide
+- **[IMPLEMENTATION_COMPLETE.md](docs/IMPLEMENTATION_COMPLETE.md)** - Implementation status
 
 ---
 
 **Bottom Line:**
-The AuditSync Consumer guarantees **reliable, duplicate-free persistence** of Oracle audit events from Kafka into Oracle database — no gaps, no replays, no silent failures.
+The AuditSync Consumer guarantees **reliable, duplicate-free persistence** of Oracle audit events from Kafka into Oracle database with **intelligent case-based processing** — no gaps, no replays, no silent failures, no noise.

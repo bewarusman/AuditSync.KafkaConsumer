@@ -36,10 +36,12 @@ public class ExtractionService : IExtractionService
             {
                 var sourceValue = GetSourceValue(auditMessage, rule.SourceField);
 
+                var sourceFieldName = GetSourceFieldName(rule.SourceField);
+
                 if (string.IsNullOrEmpty(sourceValue))
                 {
                     _logger.LogDebug("Source field '{SourceField}' is empty for rule '{RuleName}'",
-                        rule.SourceField, rule.RuleName);
+                        sourceFieldName, rule.RuleName);
                     continue;
                 }
 
@@ -64,7 +66,7 @@ public class ExtractionService : IExtractionService
                                 RuleId = rule.Id,
                                 RuleName = rule.RuleName,
                                 RegexPattern = rule.RegexPattern,
-                                SourceField = rule.SourceField,
+                                SourceField = sourceFieldName,
                                 Value = capturedValue
                             };
 
@@ -76,12 +78,12 @@ public class ExtractionService : IExtractionService
                     }
 
                     _logger.LogDebug("Rule '{RuleName}' extracted {MatchCount} value(s) from source field '{SourceField}'",
-                        rule.RuleName, matches.Count, rule.SourceField);
+                        rule.RuleName, matches.Count, sourceFieldName);
                 }
                 else
                 {
                     _logger.LogDebug("Rule '{RuleName}' did not match in source field '{SourceField}'",
-                        rule.RuleName, rule.SourceField);
+                        rule.RuleName, sourceFieldName);
                 }
             }
             catch (RegexMatchTimeoutException ex)
@@ -102,26 +104,49 @@ public class ExtractionService : IExtractionService
         return await Task.FromResult(extractedValues);
     }
 
-    private string? GetSourceValue(AuditMessage message, string sourceField)
+    private string? GetSourceValue(AuditMessage message, int sourceFieldType)
     {
         // Map source field to audit message property
-        return sourceField.ToLower() switch
+        return (SourceFieldType)sourceFieldType switch
         {
-            "text" or "sqltext" => message.SqlText,
-            "bindvariables" => message.BindVariables,
-            "owner" => message.Owner,
-            "name" => message.Name,
-            "dbuser" => message.DbUser,
-            "userhost" => message.UserHost,
-            "terminal" => message.Terminal,
-            "osuser" => message.OsUser,
-            "target" => message.Target,
-            "authprivileges" => message.AuthPrivileges,
-            "authgrantee" => message.AuthGrantee,
-            "newowner" => message.NewOwner,
-            "newname" => message.NewName,
-            "privilegeused" => message.PrivilegeUsed,
+            SourceFieldType.SqlText => message.SqlText,
+            SourceFieldType.BindVariables => message.BindVariables,
+            SourceFieldType.Owner => message.Owner,
+            SourceFieldType.Name => message.Name,
+            SourceFieldType.DbUser => message.DbUser,
+            SourceFieldType.UserHost => message.UserHost,
+            SourceFieldType.Terminal => message.Terminal,
+            SourceFieldType.OsUser => message.OsUser,
+            SourceFieldType.Target => message.Target,
+            SourceFieldType.AuthPrivileges => message.AuthPrivileges,
+            SourceFieldType.AuthGrantee => message.AuthGrantee,
+            SourceFieldType.NewOwner => message.NewOwner,
+            SourceFieldType.NewName => message.NewName,
+            SourceFieldType.PrivilegeUsed => message.PrivilegeUsed,
             _ => null
+        };
+    }
+
+    private string GetSourceFieldName(int sourceFieldType)
+    {
+        // Convert numeric field type to string name for denormalization
+        return (SourceFieldType)sourceFieldType switch
+        {
+            SourceFieldType.SqlText => "SqlText",
+            SourceFieldType.BindVariables => "BindVariables",
+            SourceFieldType.Owner => "Owner",
+            SourceFieldType.Name => "Name",
+            SourceFieldType.DbUser => "DbUser",
+            SourceFieldType.UserHost => "UserHost",
+            SourceFieldType.Terminal => "Terminal",
+            SourceFieldType.OsUser => "OsUser",
+            SourceFieldType.Target => "Target",
+            SourceFieldType.AuthPrivileges => "AuthPrivileges",
+            SourceFieldType.AuthGrantee => "AuthGrantee",
+            SourceFieldType.NewOwner => "NewOwner",
+            SourceFieldType.NewName => "NewName",
+            SourceFieldType.PrivilegeUsed => "PrivilegeUsed",
+            _ => "Unknown"
         };
     }
 }

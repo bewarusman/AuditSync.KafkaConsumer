@@ -47,10 +47,9 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "msisdn",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"msisdn\s*=\s*'(\d+)'",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             }
         };
 
@@ -79,19 +78,17 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "msisdn",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"msisdn\s*=\s*'(\d+)'",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             },
             new ExtractionRule
             {
                 Id = "rule-2",
                 RuleName = "imsi",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"imsi\s*=\s*'(\d+)'",
-                RuleOrder = 2,
-                IsActive = true
+                RuleOrder = 2
             }
         };
 
@@ -119,10 +116,9 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "msisdn",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"msisdn\s*=\s*'(\d+)'",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             }
         };
 
@@ -146,10 +142,9 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "msisdn",
-                SourceField = "bindVariables",
+                SourceField = "bindVariables".ToSourceFieldType(),
                 RegexPattern = @"#1\(\d+\):(\d+)",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             }
         };
 
@@ -175,10 +170,9 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "msisdn",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"msisdn\s*=\s*'(\d+)'",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             }
         };
 
@@ -203,19 +197,17 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "msisdn",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"msisdn\s*=\s*'(\d+)'",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             },
             new ExtractionRule
             {
                 Id = "rule-2",
                 RuleName = "schema",
-                SourceField = "owner",
+                SourceField = "owner".ToSourceFieldType(),
                 RegexPattern = @"(CDR_\w+)",
-                RuleOrder = 2,
-                IsActive = true
+                RuleOrder = 2
             }
         };
 
@@ -243,10 +235,9 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "email",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"email\s*=\s*'([^']+@[^']+)'",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             }
         };
 
@@ -271,28 +262,25 @@ public class ExtractionServiceTests
             {
                 Id = "rule-3",
                 RuleName = "rule3",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"msisdn\s*=\s*'(\d+)'",
-                RuleOrder = 3,
-                IsActive = true
+                RuleOrder = 3
             },
             new ExtractionRule
             {
                 Id = "rule-1",
                 RuleName = "rule1",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"msisdn\s*=\s*'(\d+)'",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             },
             new ExtractionRule
             {
                 Id = "rule-2",
                 RuleName = "rule2",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"msisdn\s*=\s*'(\d+)'",
-                RuleOrder = 2,
-                IsActive = true
+                RuleOrder = 2
             }
         };
 
@@ -319,10 +307,9 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "msisdn",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"96475\d{8}", // No capturing group - matches only digits
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             }
         };
 
@@ -348,10 +335,9 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "privilege",
-                SourceField = "privilegeUsed",
+                SourceField = "privilegeUsed".ToSourceFieldType(),
                 RegexPattern = @"(\w+)",
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             }
         };
 
@@ -375,10 +361,9 @@ public class ExtractionServiceTests
             {
                 Id = "rule-1",
                 RuleName = "status_id",
-                SourceField = "text",
+                SourceField = "text".ToSourceFieldType(),
                 RegexPattern = @"status\s*=\s*(\d+)", // First capturing group
-                RuleOrder = 1,
-                IsActive = true
+                RuleOrder = 1
             }
         };
 

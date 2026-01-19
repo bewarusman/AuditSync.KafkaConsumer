@@ -42,13 +42,13 @@ public class RegexRuleEngineTests
             new ExtractionRule
             {
                 RuleName = "MSISDN",
-                SourceField = "bindVariables",
+                SourceField = "bindVariables".ToSourceFieldType(),
                 RegexPattern = @"#1\(\d+\):(\d+)"
             },
             new ExtractionRule
             {
                 RuleName = "STATUS_ID",
-                SourceField = "sqlText",
+                SourceField = "sqlText".ToSourceFieldType(),
                 RegexPattern = @"STATUS_ID=(\d+)"
             }
         };
@@ -87,7 +87,7 @@ public class RegexRuleEngineTests
             new ExtractionRule
             {
                 RuleName = "OPTIONAL_FIELD",
-                SourceField = "sqlText",
+                SourceField = "sqlText".ToSourceFieldType(),
                 RegexPattern = @"NONEXISTENT=(\w+)"
             }
         };
@@ -121,7 +121,7 @@ public class RegexRuleEngineTests
             new ExtractionRule
             {
                 RuleName = "MSISDN",
-                SourceField = "sqlText",
+                SourceField = "sqlText".ToSourceFieldType(),
                 RegexPattern = @"MSISDN=:(\w+)"
             }
         };
@@ -183,11 +183,11 @@ public class RegexRuleEngineTests
 
         var rules = new List<ExtractionRule>
         {
-            new ExtractionRule { RuleName = "OWNER", SourceField = "owner", RegexPattern = @"^(\w+)$" },
-            new ExtractionRule { RuleName = "NAME", SourceField = "name", RegexPattern = @"^(\w+)$" },
-            new ExtractionRule { RuleName = "TEXT_MATCH", SourceField = "sqlText", RegexPattern = @"FROM (\w+)" },
-            new ExtractionRule { RuleName = "BIND_VALUE", SourceField = "bindVariables", RegexPattern = @":(\w+)" },
-            new ExtractionRule { RuleName = "DB_USER", SourceField = "dbUser", RegexPattern = @"^(\w+)$" }
+            new ExtractionRule { RuleName = "OWNER", SourceField = "owner".ToSourceFieldType(), RegexPattern = @"^(\w+)$" },
+            new ExtractionRule { RuleName = "NAME", SourceField = "name".ToSourceFieldType(), RegexPattern = @"^(\w+)$" },
+            new ExtractionRule { RuleName = "TEXT_MATCH", SourceField = "sqlText".ToSourceFieldType(), RegexPattern = @"FROM (\w+)" },
+            new ExtractionRule { RuleName = "BIND_VALUE", SourceField = "bindVariables".ToSourceFieldType(), RegexPattern = @":(\w+)" },
+            new ExtractionRule { RuleName = "DB_USER", SourceField = "dbUser".ToSourceFieldType(), RegexPattern = @"^(\w+)$" }
         };
 
         _ruleRepositoryMock.Setup(r => r.GetRulesByTargetAsync("Production Oracle Database"))
@@ -223,7 +223,7 @@ public class RegexRuleEngineTests
             new ExtractionRule
             {
                 RuleName = "PRIVILEGE",
-                SourceField = "privilegeUsed",
+                SourceField = "privilegeUsed".ToSourceFieldType(),
                 RegexPattern = @"(\w+)"
             }
         };

@@ -105,25 +105,25 @@ public class RegexRuleEngine : IRuleEngine
         }
     }
 
-    private string? GetSourceValue(AuditMessage message, string sourceField)
+    private string? GetSourceValue(AuditMessage message, int sourceFieldType)
     {
         // Access properties from flattened structure directly
-        return sourceField.ToLower() switch
+        return (SourceFieldType)sourceFieldType switch
         {
-            "sqltext" => message.SqlText,
-            "bindvariables" => message.BindVariables,
-            "owner" => message.Owner,
-            "name" => message.Name,
-            "dbuser" => message.DbUser,
-            "userhost" => message.UserHost,
-            "terminal" => message.Terminal,
-            "osuser" => message.OsUser,
-            "target" => message.Target,
-            "authprivileges" => message.AuthPrivileges,
-            "authgrantee" => message.AuthGrantee,
-            "newowner" => message.NewOwner,
-            "newname" => message.NewName,
-            "privilegeused" => message.PrivilegeUsed,
+            SourceFieldType.SqlText => message.SqlText,
+            SourceFieldType.BindVariables => message.BindVariables,
+            SourceFieldType.Owner => message.Owner,
+            SourceFieldType.Name => message.Name,
+            SourceFieldType.DbUser => message.DbUser,
+            SourceFieldType.UserHost => message.UserHost,
+            SourceFieldType.Terminal => message.Terminal,
+            SourceFieldType.OsUser => message.OsUser,
+            SourceFieldType.Target => message.Target,
+            SourceFieldType.AuthPrivileges => message.AuthPrivileges,
+            SourceFieldType.AuthGrantee => message.AuthGrantee,
+            SourceFieldType.NewOwner => message.NewOwner,
+            SourceFieldType.NewName => message.NewName,
+            SourceFieldType.PrivilegeUsed => message.PrivilegeUsed,
             _ => null
         };
     }

@@ -16,9 +16,8 @@ public class ExtractionRuleTests
             TargetId = "target-1",
             TargetName = "Production Oracle Database",
             RuleName = "MSISDN",
-            SourceField = "sqlText",
+            SourceField = "sqlText".ToSourceFieldType(),
             RegexPattern = @"MSISDN=:(\w+)",
-            IsActive = true,
             RuleOrder = 1
         };
 
@@ -27,19 +26,8 @@ public class ExtractionRuleTests
         rule.TargetId.Should().Be("target-1");
         rule.TargetName.Should().Be("Production Oracle Database");
         rule.RuleName.Should().Be("MSISDN");
-        rule.SourceField.Should().Be("sqlText");
+        rule.SourceField.Should().Be("sqlText".ToSourceFieldType());
         rule.RegexPattern.Should().Be(@"MSISDN=:(\w+)");
-        rule.IsActive.Should().BeTrue();
         rule.RuleOrder.Should().Be(1);
-    }
-
-    [Fact]
-    public void ExtractionRule_IsActive_DefaultsToFalse()
-    {
-        // Arrange & Act
-        var rule = new ExtractionRule();
-
-        // Assert
-        rule.IsActive.Should().BeFalse();
     }
 }

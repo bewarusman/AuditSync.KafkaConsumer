@@ -28,13 +28,12 @@ public class RuleRepository : IRuleRepository
             await connection.OpenAsync();
 
             var sql = @"
-                SELECT r.ID, r.TARGET_ID AS TargetId, t.NAME AS TargetName, r.RULE_NAME AS RuleName,
+                SELECT r.ID, r.TARGET_ID AS TargetId, t.NAME AS TargetName, r.NAME AS RuleName,
                        r.SOURCE_FIELD AS SourceField, r.REGEX_PATTERN AS RegexPattern,
-                       r.IS_ACTIVE AS IsActive, r.RULE_ORDER AS RuleOrder
+                       r.IS_REQUIRED AS IsRequired, r.RULE_ORDER AS RuleOrder
                 FROM target_rules r
                 INNER JOIN targets t ON r.TARGET_ID = t.ID
                 WHERE t.NAME = :TargetName
-                  AND r.IS_ACTIVE = 1
                 ORDER BY r.RULE_ORDER";
 
             var rules = await connection.QueryAsync<ExtractionRule>(sql, new { TargetName = targetName });

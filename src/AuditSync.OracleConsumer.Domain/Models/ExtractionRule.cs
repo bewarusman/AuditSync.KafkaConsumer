@@ -16,9 +16,9 @@ public class ExtractionRule
     public string RuleName { get; set; } = string.Empty;
 
     /// <summary>
-    /// The source field in the audit message (e.g., "text", "bindVariables", "owner", "name").
+    /// The source field in the audit message (0=SqlText, 1=BindVariables, etc.).
     /// </summary>
-    public string SourceField { get; set; } = string.Empty;
+    public int SourceField { get; set; }
 
     /// <summary>
     /// The regex pattern used to extract the value.
@@ -26,6 +26,10 @@ public class ExtractionRule
     /// </summary>
     public string RegexPattern { get; set; } = string.Empty;
 
-    public bool IsActive { get; set; }
+    /// <summary>
+    /// Whether this rule is required (0=optional, 1=required).
+    /// </summary>
+    public int IsRequired { get; set; }
+
     public int RuleOrder { get; set; }
 }
