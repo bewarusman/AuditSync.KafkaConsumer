@@ -55,7 +55,7 @@ public class AuditMessageRepository : IAuditMessageRepository
                         NEW_OWNER = :NewOwner,
                         NEW_NAME = :NewName,
                         PRIVILEGE_USED = :PrivilegeUsed,
-                        TEXT = :Text,
+                        SQL_TEXT = :Text,
                         BIND_VARIABLES = :BindVariables,
                         TIMESTAMP = :Timestamp,
                         PRODUCED_AT = :ProducedAt,
@@ -109,7 +109,7 @@ public class AuditMessageRepository : IAuditMessageRepository
                 var insertSql = @"
                     INSERT INTO audit_logs (ID, TARGET, SESSION_ID, ENTRY_ID, STATEMENT, DB_USER, USER_HOST, TERMINAL, OS_USER,
                             ACTION, RETURN_CODE, OWNER, NAME, AUTH_PRIVILEGES, AUTH_GRANTEE, NEW_OWNER, NEW_NAME,
-                            PRIVILEGE_USED, TEXT, BIND_VARIABLES, TIMESTAMP, PRODUCED_AT, KAFKA_PARTITION, KAFKA_OFFSET,
+                            PRIVILEGE_USED, SQL_TEXT, BIND_VARIABLES, TIMESTAMP, PRODUCED_AT, KAFKA_PARTITION, KAFKA_OFFSET,
                             PROCESS_COUNTER, PROCESSED_AT, CONSUMED_AT)
                     VALUES (:Id, :Target, :SessionId, :EntryId, :Statement, :DbUser, :UserHost, :Terminal, :OsUser,
                             :Action, :ReturnCode, :Owner, :Name, :AuthPrivileges, :AuthGrantee, :NewOwner, :NewName,
