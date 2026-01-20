@@ -91,10 +91,17 @@ builder.Services.AddSingleton<ICaseExtractionRepository>(sp =>
     return new CaseExtractionRepository(oracleConnectionString, logger);
 });
 
+builder.Services.AddSingleton<IRuleTagRepository>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<RuleTagRepository>>();
+    return new RuleTagRepository(oracleConnectionString, logger);
+});
+
 // Register Services
 builder.Services.AddSingleton<IRuleEngine, RegexRuleEngine>();
 builder.Services.AddSingleton<IAuditDataService, AuditDataService>();
 builder.Services.AddSingleton<IOffsetManager, OffsetManager>();
+builder.Services.AddSingleton<ITagEvaluationService, TagEvaluationService>();
 builder.Services.AddSingleton<IExtractionService, ExtractionService>();
 builder.Services.AddSingleton<ICaseService, CaseService>();
 

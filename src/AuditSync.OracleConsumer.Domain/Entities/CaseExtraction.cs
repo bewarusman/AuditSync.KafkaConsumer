@@ -15,4 +15,10 @@ public class CaseExtraction
     public string SourceField { get; set; } = string.Empty;  // Where the value was extracted from
     public string? FieldValue { get; set; }  // The actual extracted value
     public DateTime ExtractedAt { get; set; }
+
+    /// <summary>
+    /// Comma-separated list of tags applied to this extracted value.
+    /// Example: "VIP,Priority"
+    /// </summary>
+    public string? Tags { get; set; }
 }

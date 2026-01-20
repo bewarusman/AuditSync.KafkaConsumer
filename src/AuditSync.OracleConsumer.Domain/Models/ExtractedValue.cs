@@ -11,4 +11,10 @@ public class ExtractedValue
     public string RegexPattern { get; set; } = string.Empty;
     public string SourceField { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
+
+    /// <summary>
+    /// List of tags applied to this extracted value based on tag rules.
+    /// Example: ["VIP", "Priority"]
+    /// </summary>
+    public List<string> Tags { get; set; } = new List<string>();
 }

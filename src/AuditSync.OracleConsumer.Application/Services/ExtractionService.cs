@@ -8,15 +8,22 @@ namespace AuditSync.OracleConsumer.Application.Services;
 
 /// <summary>
 /// Service for applying extraction rules to audit messages.
-/// Extracts values using regex patterns from specified source fields.
+/// Extracts values using regex patterns from specified source fields and applies tags based on tag rules.
 /// </summary>
 public class ExtractionService : IExtractionService
 {
     private readonly ILogger<ExtractionService> _logger;
+    private readonly IRuleTagRepository _ruleTagRepository;
+    private readonly ITagEvaluationService _tagEvaluationService;
 
-    public ExtractionService(ILogger<ExtractionService> logger)
+    public ExtractionService(
+        ILogger<ExtractionService> logger,
+        IRuleTagRepository ruleTagRepository,
+        ITagEvaluationService tagEvaluationService)
     {
         _logger = logger;
+        _ruleTagRepository = ruleTagRepository;
+        _tagEvaluationService = tagEvaluationService;
     }
 
     public async Task<List<ExtractedValue>> ApplyRulesAsync(AuditMessage auditMessage, List<ExtractionRule> rules)
@@ -28,6 +35,10 @@ public class ExtractionService : IExtractionService
             _logger.LogDebug("No rules provided for message {MessageId}", auditMessage.Id);
             return extractedValues;
         }
+
+        // Load all tag rules for the extraction rules (batch load for efficiency)
+        var ruleIds = rules.Select(r => r.Id).ToList();
+        var tagRulesByRuleId = await _ruleTagRepository.GetActiveTagRulesByRuleIdsAsync(ruleIds);
 
         // Apply each rule
         foreach (var rule in rules.OrderBy(r => r.RuleOrder))
@@ -51,6 +62,11 @@ public class ExtractionService : IExtractionService
 
                 if (matches.Count > 0)
                 {
+                    // Get tag rules for this extraction rule
+                    var tagRulesForRule = tagRulesByRuleId.ContainsKey(rule.Id)
+                        ? tagRulesByRuleId[rule.Id]
+                        : new List<RuleTag>();
+
                     // Extract ALL matches, not just the first one
                     foreach (Match match in matches)
                     {
@@ -61,19 +77,31 @@ public class ExtractionService : IExtractionService
                                 ? match.Groups[1].Value
                                 : match.Value;
 
+                            // Evaluate tags for this extracted value
+                            var appliedTags = await _tagEvaluationService.EvaluateTagsAsync(capturedValue, tagRulesForRule);
+
                             var extractedValue = new ExtractedValue
                             {
                                 RuleId = rule.Id,
                                 RuleName = rule.RuleName,
                                 RegexPattern = rule.RegexPattern,
                                 SourceField = sourceFieldName,
-                                Value = capturedValue
+                                Value = capturedValue,
+                                Tags = appliedTags
                             };
 
                             extractedValues.Add(extractedValue);
 
-                            _logger.LogDebug("Rule '{RuleName}' extracted value: {Value}",
-                                rule.RuleName, capturedValue);
+                            if (appliedTags.Count > 0)
+                            {
+                                _logger.LogDebug("Rule '{RuleName}' extracted value: {Value} with tags: {Tags}",
+                                    rule.RuleName, capturedValue, string.Join(", ", appliedTags));
+                            }
+                            else
+                            {
+                                _logger.LogDebug("Rule '{RuleName}' extracted value: {Value}",
+                                    rule.RuleName, capturedValue);
+                            }
                         }
                     }
 
@@ -101,7 +129,7 @@ public class ExtractionService : IExtractionService
         _logger.LogInformation("Extracted {Count} value(s) from message {MessageId}",
             extractedValues.Count, auditMessage.Id);
 
-        return await Task.FromResult(extractedValues);
+        return extractedValues;
     }
 
     private string? GetSourceValue(AuditMessage message, int sourceFieldType)

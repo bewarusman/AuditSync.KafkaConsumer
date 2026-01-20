@@ -34,9 +34,9 @@ public class CaseExtractionRepository : ICaseExtractionRepository
 
             var sql = @"
                 INSERT INTO case_extractions (ID, CASE_ID, AUDIT_LOG_ID, RULE_ID, RULE_NAME,
-                                              REGEX_PATTERN, SOURCE_FIELD, FIELD_VALUE, EXTRACTED_AT)
+                                              REGEX_PATTERN, SOURCE_FIELD, FIELD_VALUE, TAGS, EXTRACTED_AT)
                 VALUES (:Id, :CaseId, :AuditLogId, :RuleId, :RuleName,
-                        :RegexPattern, :SourceField, :FieldValue, :ExtractedAt)";
+                        :RegexPattern, :SourceField, :FieldValue, :Tags, :ExtractedAt)";
 
             var rowsAffected = await connection.ExecuteAsync(sql, extractions);
 
@@ -62,7 +62,7 @@ public class CaseExtractionRepository : ICaseExtractionRepository
             var sql = @"
                 SELECT ID, CASE_ID as CaseId, AUDIT_LOG_ID as AuditLogId, RULE_ID as RuleId,
                        RULE_NAME as RuleName, REGEX_PATTERN as RegexPattern, SOURCE_FIELD as SourceField,
-                       FIELD_VALUE as FieldValue, EXTRACTED_AT as ExtractedAt
+                       FIELD_VALUE as FieldValue, TAGS as Tags, EXTRACTED_AT as ExtractedAt
                 FROM case_extractions
                 WHERE CASE_ID = :CaseId
                 ORDER BY EXTRACTED_AT";
@@ -88,7 +88,7 @@ public class CaseExtractionRepository : ICaseExtractionRepository
             var sql = @"
                 SELECT ID, CASE_ID as CaseId, AUDIT_LOG_ID as AuditLogId, RULE_ID as RuleId,
                        RULE_NAME as RuleName, REGEX_PATTERN as RegexPattern, SOURCE_FIELD as SourceField,
-                       FIELD_VALUE as FieldValue, EXTRACTED_AT as ExtractedAt
+                       FIELD_VALUE as FieldValue, TAGS as Tags, EXTRACTED_AT as ExtractedAt
                 FROM case_extractions
                 WHERE AUDIT_LOG_ID = :AuditLogId
                 ORDER BY EXTRACTED_AT";

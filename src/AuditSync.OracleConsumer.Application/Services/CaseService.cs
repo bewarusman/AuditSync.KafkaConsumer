@@ -79,6 +79,7 @@ public class CaseService : ICaseService
                 RegexPattern = ev.RegexPattern,  // Denormalized
                 SourceField = ev.SourceField,  // Denormalized
                 FieldValue = ev.Value,
+                Tags = ev.Tags.Count > 0 ? string.Join(",", ev.Tags) : null,  // Convert list to comma-separated string
                 ExtractedAt = DateTime.UtcNow
             }).ToList();
 

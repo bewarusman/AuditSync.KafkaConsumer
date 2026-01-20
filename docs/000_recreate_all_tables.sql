@@ -316,6 +316,7 @@ CREATE TABLE case_extractions (
     REGEX_PATTERN VARCHAR2(1000) NOT NULL,   -- Denormalized from target_rules for audit trail
     SOURCE_FIELD VARCHAR2(100) NOT NULL,     -- Denormalized from target_rules (where value was extracted from)
     FIELD_VALUE VARCHAR2(4000),              -- The actual extracted value
+    TAGS VARCHAR2(1000) DEFAULT NULL,        -- Comma-separated list of applied tags (e.g., "VIP,Priority")
     EXTRACTED_AT TIMESTAMP DEFAULT SYSTIMESTAMP,
     CONSTRAINT FK_EXTRACTION_CASE FOREIGN KEY (CASE_ID)
         REFERENCES cases(ID) ON DELETE CASCADE,
@@ -336,8 +337,46 @@ CREATE INDEX IDX_EXTRACTIONS_RULE_ID ON case_extractions(RULE_ID);
 CREATE INDEX IDX_EXTRACTIONS_RULE_NAME ON case_extractions(RULE_NAME);
 CREATE INDEX IDX_EXTRACTIONS_VALUE ON case_extractions(FIELD_VALUE);
 CREATE INDEX IDX_EXTRACTIONS_NAME_VALUE ON case_extractions(RULE_NAME, FIELD_VALUE);
+CREATE INDEX IDX_EXTRACTIONS_TAGS ON case_extractions(TAGS);
 
 PROMPT ✓ Indexes for case_extractions created
+PROMPT
+
+-- ----------------------------------------------------------------------------
+-- Table 6: rule_tags
+-- ----------------------------------------------------------------------------
+-- Purpose: Store tag configurations for extraction rules
+-- Note: Tags are applied to extracted values based on conditions
+-- ----------------------------------------------------------------------------
+
+PROMPT Creating table: rule_tags...
+
+CREATE TABLE rule_tags (
+    ID VARCHAR2(100) PRIMARY KEY,
+    RULE_ID VARCHAR2(100) NOT NULL,
+    TAG_NAME VARCHAR2(100) NOT NULL,
+    CONDITION_TYPE VARCHAR2(50) NOT NULL,
+    CONDITION_VALUE VARCHAR2(1000) NOT NULL,
+    TAG_PRIORITY NUMBER DEFAULT 0,
+    IS_ACTIVE NUMBER(1) DEFAULT 1,
+    CREATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP,
+    UPDATED_AT TIMESTAMP DEFAULT SYSTIMESTAMP,
+    CONSTRAINT FK_RULE_TAG_RULE FOREIGN KEY (RULE_ID)
+        REFERENCES target_rules(ID) ON DELETE CASCADE,
+    CONSTRAINT CHK_CONDITION_TYPE CHECK (CONDITION_TYPE IN ('StartsWith', 'EndsWith', 'Equals', 'Contains', 'Regex', 'Range'))
+);
+
+PROMPT ✓ Table rule_tags created
+
+-- Create indexes for rule_tags
+PROMPT Creating indexes for rule_tags...
+
+CREATE INDEX IDX_RULE_TAGS_RULE_ID ON rule_tags(RULE_ID);
+CREATE INDEX IDX_RULE_TAGS_ACTIVE ON rule_tags(IS_ACTIVE);
+CREATE INDEX IDX_RULE_TAGS_PRIORITY ON rule_tags(TAG_PRIORITY DESC);
+CREATE INDEX IDX_RULE_TAGS_TAG_NAME ON rule_tags(TAG_NAME);
+
+PROMPT ✓ Indexes for rule_tags created
 PROMPT
 
 -- ============================================================================
@@ -360,7 +399,9 @@ SELECT 'target_rules', COUNT(*) FROM target_rules
 UNION ALL
 SELECT 'cases', COUNT(*) FROM cases
 UNION ALL
-SELECT 'case_extractions', COUNT(*) FROM case_extractions;
+SELECT 'case_extractions', COUNT(*) FROM case_extractions
+UNION ALL
+SELECT 'rule_tags', COUNT(*) FROM rule_tags;
 
 PROMPT
 PROMPT Checking indexes...
@@ -372,7 +413,7 @@ SELECT
     uniqueness,
     status
 FROM user_indexes
-WHERE table_name IN ('AUDIT_LOGS', 'TARGETS', 'TARGET_RULES', 'CASES', 'CASE_EXTRACTIONS')
+WHERE table_name IN ('AUDIT_LOGS', 'TARGETS', 'TARGET_RULES', 'CASES', 'CASE_EXTRACTIONS', 'RULE_TAGS')
 ORDER BY table_name, index_name;
 
 PROMPT
@@ -391,7 +432,7 @@ SELECT
     END as constraint_description,
     status
 FROM user_constraints
-WHERE table_name IN ('AUDIT_LOGS', 'TARGETS', 'TARGET_RULES', 'CASES', 'CASE_EXTRACTIONS')
+WHERE table_name IN ('AUDIT_LOGS', 'TARGETS', 'TARGET_RULES', 'CASES', 'CASE_EXTRACTIONS', 'RULE_TAGS')
 ORDER BY table_name, constraint_type, constraint_name;
 
 -- ============================================================================
@@ -408,9 +449,10 @@ PROMPT   ✓ audit_logs (with 5 indexes)
 PROMPT   ✓ targets (with 1 index)
 PROMPT   ✓ target_rules (with 3 indexes)
 PROMPT   ✓ cases (with 3 indexes)
-PROMPT   ✓ case_extractions (with 6 indexes)
+PROMPT   ✓ case_extractions (with 7 indexes)
+PROMPT   ✓ rule_tags (with 4 indexes)
 PROMPT
-PROMPT Total: 5 tables, 18 indexes, 13 constraints
+PROMPT Total: 6 tables, 23 indexes, 15 constraints
 PROMPT
 PROMPT Next Steps:
 PROMPT   1. Insert sample targets and rules (see data.md for examples)
