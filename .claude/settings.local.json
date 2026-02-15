@@ -12,7 +12,13 @@
       "Bash(cmd.exe //C \"taskkill //F //PID 34236\")",
       "Bash(powershell -Command \"Stop-Process -Id 34236 -Force\")",
       "Bash(powershell:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(git push)",
+      "Bash(git push:*)",
+      "Bash(mkdir:*)",
+      "Bash(nul)",
+      "Bash(dotnet add:*)",
+      "Bash(.gitignore)"
     ],
     "deny": [],
     "ask": []

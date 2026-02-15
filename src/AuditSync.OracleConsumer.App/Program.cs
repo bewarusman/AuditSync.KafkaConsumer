@@ -44,6 +44,31 @@ var kafkaConfig = new ConsumerConfig
         Environment.GetEnvironmentVariable("KAFKA_MAX_POLL_INTERVAL_MS") ?? "300000")
 };
 
+// Add SSL/TLS configuration if specified
+var securityProtocol = Environment.GetEnvironmentVariable("KAFKA_SECURITY_PROTOCOL");
+if (!string.IsNullOrEmpty(securityProtocol))
+{
+    kafkaConfig.SecurityProtocol = Enum.Parse<SecurityProtocol>(securityProtocol, ignoreCase: true);
+
+    var sslCaLocation = Environment.GetEnvironmentVariable("KAFKA_SSL_CA_LOCATION");
+    if (!string.IsNullOrEmpty(sslCaLocation))
+    {
+        kafkaConfig.SslCaLocation = Path.Combine(Directory.GetCurrentDirectory(), sslCaLocation);
+    }
+
+    var sslCertLocation = Environment.GetEnvironmentVariable("KAFKA_SSL_CERTIFICATE_LOCATION");
+    if (!string.IsNullOrEmpty(sslCertLocation))
+    {
+        kafkaConfig.SslCertificateLocation = Path.Combine(Directory.GetCurrentDirectory(), sslCertLocation);
+    }
+
+    var sslKeyLocation = Environment.GetEnvironmentVariable("KAFKA_SSL_KEY_LOCATION");
+    if (!string.IsNullOrEmpty(sslKeyLocation))
+    {
+        kafkaConfig.SslKeyLocation = Path.Combine(Directory.GetCurrentDirectory(), sslKeyLocation);
+    }
+}
+
 // Register Kafka Consumer
 builder.Services.AddSingleton<IConsumer<string, string>>(sp =>
 {
@@ -96,6 +121,49 @@ builder.Services.AddSingleton<IRuleTagRepository>(sp =>
     var logger = sp.GetRequiredService<ILogger<RuleTagRepository>>();
     return new RuleTagRepository(oracleConnectionString, logger);
 });
+
+// Register Rules Engine Repositories (NEW)
+var enableRulesEngine = bool.Parse(Environment.GetEnvironmentVariable("AUDITSYNC_ENABLE_RULES_ENGINE") ?? "false");
+if (enableRulesEngine)
+{
+    builder.Services.AddSingleton<IRulesEngineRepository>(sp =>
+    {
+        var logger = sp.GetRequiredService<ILogger<RulesEngineRepository>>();
+        return new RulesEngineRepository(oracleConnectionString, logger);
+    });
+
+    builder.Services.AddSingleton<IRuleExtractionRepository>(sp =>
+    {
+        var logger = sp.GetRequiredService<ILogger<RuleExtractionRepository>>();
+        return new RuleExtractionRepository(oracleConnectionString, logger);
+    });
+
+    // Register Rules Engine Services (NEW)
+    var jsTimeout = int.Parse(Environment.GetEnvironmentVariable("AUDITSYNC_JAVASCRIPT_TIMEOUT_SECONDS") ?? "5");
+    builder.Services.AddSingleton(sp =>
+    {
+        var logger = sp.GetRequiredService<ILogger<JavaScriptExtractor>>();
+        return new JavaScriptExtractor(logger, jsTimeout);
+    });
+
+    builder.Services.AddSingleton<RulesEngineService>();
+
+    // Register Rules Cache (NEW)
+    var targetName = Environment.GetEnvironmentVariable("AUDITSYNC_TARGET_SYSTEM_NAME") ?? "DWH";
+    var refreshHours = int.Parse(Environment.GetEnvironmentVariable("AUDITSYNC_RULES_CACHE_REFRESH_HOURS") ?? "24");
+    builder.Services.AddSingleton(sp =>
+    {
+        var repository = sp.GetRequiredService<IRulesEngineRepository>();
+        var logger = sp.GetRequiredService<ILogger<RulesCache>>();
+        return new RulesCache(repository, targetName, logger, refreshHours);
+    });
+
+    Console.WriteLine($"Rules Engine ENABLED - Target: {targetName}, Cache Refresh: {refreshHours}h, JS Timeout: {jsTimeout}s");
+}
+else
+{
+    Console.WriteLine("Rules Engine DISABLED - Using legacy extraction rules");
+}
 
 // Register Services
 builder.Services.AddSingleton<IRuleEngine, RegexRuleEngine>();

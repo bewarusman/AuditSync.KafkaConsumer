@@ -5,6 +5,13 @@
   </Folder>
   <Folder Name="/Solution Items/docs/">
     <File Path="docs/000_recreate_all_tables.sql" />
+    <File Path="docs/001_create_tables.sql" />
+    <File Path="docs/002_insert_sample_data.sql" />
+    <File Path="docs/003_create_case_tables.sql" />
+    <File Path="docs/004_add_tagging_support.sql" />
+    <File Path="docs/005_create_case_extractions_table.sql" />
+    <File Path="docs/006_update_case_extractions_metadata.sql" />
+    <File Path="docs/007_recreate_case_extractions_table.sql" />
     <File Path="docs/architecture.md" />
     <File Path="docs/case_plan.md" />
     <File Path="docs/data.md" />

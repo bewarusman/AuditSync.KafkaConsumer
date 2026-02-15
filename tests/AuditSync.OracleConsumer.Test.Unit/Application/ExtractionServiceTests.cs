@@ -1,5 +1,6 @@
 using AuditSync.OracleConsumer.Application.Services;
 using AuditSync.OracleConsumer.Domain.Entities;
+using AuditSync.OracleConsumer.Domain.Interfaces;
 using AuditSync.OracleConsumer.Domain.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -11,12 +12,16 @@ namespace AuditSync.OracleConsumer.Test.Unit.Application;
 public class ExtractionServiceTests
 {
     private readonly Mock<ILogger<ExtractionService>> _loggerMock;
+    private readonly Mock<IRuleTagRepository> _ruleTagRepositoryMock;
+    private readonly Mock<ITagEvaluationService> _tagEvaluationServiceMock;
     private readonly ExtractionService _service;
 
     public ExtractionServiceTests()
     {
         _loggerMock = new Mock<ILogger<ExtractionService>>();
-        _service = new ExtractionService(_loggerMock.Object);
+        _ruleTagRepositoryMock = new Mock<IRuleTagRepository>();
+        _tagEvaluationServiceMock = new Mock<ITagEvaluationService>();
+        _service = new ExtractionService(_loggerMock.Object, _ruleTagRepositoryMock.Object, _tagEvaluationServiceMock.Object);
     }
 
     [Fact]
