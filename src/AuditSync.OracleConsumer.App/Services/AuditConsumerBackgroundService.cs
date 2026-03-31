@@ -70,11 +70,13 @@ public class AuditConsumerBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("AuditSync Consumer starting...");
+        _logger.LogInformation("Rules engine enabled: {Enabled}", _useRulesEngine);
 
         // Subscribe to Kafka topic
         _kafkaConsumer.Subscribe(_topic);
 
         _logger.LogInformation("Subscribed to topic: {Topic}", _topic);
+        _logger.LogInformation("Waiting for messages from Kafka...");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -175,6 +177,7 @@ public class AuditConsumerBackgroundService : BackgroundService
     {
         // Step 1: Fetch cached rules
         var rules = await _rulesCache!.GetRulesAsync(stoppingToken);
+        _logger.LogDebug("Loaded {Count} rules from cache", rules.Count);
 
         // Step 2: Evaluate rules (short-circuit on first match)
         var matchedRule = await _rulesEngineService!.EvaluateRulesAsync(rules, auditMessage, stoppingToken);
@@ -184,6 +187,7 @@ public class AuditConsumerBackgroundService : BackgroundService
             auditMessage,
             consumeResult.Partition.Value,
             consumeResult.Offset.Value);
+        _logger.LogDebug("Stored audit log {AuditLogId}", auditMessage.Id);
 
         // Step 4: Create case and store extractions if rule matched
         if (matchedRule != null && matchedRule.Matched && matchedRule.Actions.CreateCase)

@@ -18,6 +18,7 @@
     <File Path="docs/IMPLEMENTATION_COMPLETE.md" />
     <File Path="docs/insert_dwh_target_rules.sql" />
     <File Path="docs/plan.md" />
+    <File Path="docs/troubleshooting_rules.sql" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/AuditSync.OracleConsumer.App/AuditSync.OracleConsumer.App.csproj" Id="bbfbea89-fffd-4de4-9a20-8486c3fb2acc" />

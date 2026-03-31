@@ -18,7 +18,10 @@
       "Bash(mkdir:*)",
       "Bash(nul)",
       "Bash(dotnet add:*)",
-      "Bash(.gitignore)"
+      "Bash(.gitignore)",
+      "Bash(findstr:*)",
+      "Bash(Select-String -Pattern \"succeeded|error\")",
+      "Bash(tasklist:*)"
     ],
     "deny": [],
     "ask": []

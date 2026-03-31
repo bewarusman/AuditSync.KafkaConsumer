@@ -1,0 +1,191 @@
+╔════════════════════════════════════════════════════════════════╗
+║ TEST RESULTS - Audit Log: 9999916_133_0                       ║
+╚════════════════════════════════════════════════════════════════╝
+Audit Details: Target=DWH, DbUser=RENAS, Owner=DWH_USER, Name=SUBSCRIBERS, Action=SELECT
+
+───────────────────────────────────────────────────────────────
+Rule 1: Security Team
+
+Status: ✓ Matched
+Conditions: 2 of 2 Met
+
+• Condition 1: Met
+  Expected: dbUser in 'ACHATO,KVIDRESS,LALI,WAFAA,SKHALID,RENAS,AWALI,MTAHER,AZADS,MUNEEBA'
+  Actual: dbUser = 'RENAS'
+
+• Condition 2: Met
+  Expected: sqlText regex '\d{9,}'
+  Actual: sqlText = 'select /*+ parallel (16) */ distinct MANUFACTURER, MANUFACTURER_NAME, MODEL, PICTURE, DEVICE_TY...'
+
+JavaScript Returned Object:
+[
+  {
+    "value": "354805722283610",
+    "type": "ACTIVATION CODE",
+    "tags": []
+  }
+]
+
+Actions Triggered: Create Case
+
+
+╔════════════════════════════════════════════════════════════════╗
+║ TEST RESULTS - Audit Log: 9999916_133_1                       ║
+╚════════════════════════════════════════════════════════════════╝
+Audit Details: Target=DWH, DbUser=DWH_USER, Owner=DWH_USER, Name=PRODUCTS, Action=SELECT
+
+───────────────────────────────────────────────────────────────
+Rule 1: Security Team
+
+Status: ✗ Not Matched
+Conditions: 0 of 2 Met
+
+• Condition 1: Not Met
+  Expected: dbUser in 'ACHATO,KVIDRESS,LALI,WAFAA,SKHALID,RENAS,AWALI,MTAHER,AZADS,MUNEEBA'
+  Actual: dbUser = 'DWH_USER'
+
+  (1 condition(s) not evaluated due to short-circuit)
+
+───────────────────────────────────────────────────────────────
+Rule 2: Other
+
+Status: ✗ Not Matched
+Conditions: 0 of 1 Met
+
+• Condition 1: Not Met
+  Expected: action in 'INSERT,UPDATE,DELETE'
+  Actual: action = 'SELECT'
+
+═══════════════════════════════════════════════════════════════
+Result: No rules matched
+═══════════════════════════════════════════════════════════════
+
+
+╔════════════════════════════════════════════════════════════════╗
+║ TEST RESULTS - Audit Log: 9999916_133_2                       ║
+╚════════════════════════════════════════════════════════════════╝
+Audit Details: Target=DWH, DbUser=RENAS, Owner=DWH_USER, Name=SUBSCRIBERS, Action=INSERT
+
+───────────────────────────────────────────────────────────────
+Rule 1: Security Team
+
+Status: ✗ Not Matched
+Conditions: 1 of 2 Met
+
+• Condition 1: Met
+  Expected: dbUser in 'ACHATO,KVIDRESS,LALI,WAFAA,SKHALID,RENAS,AWALI,MTAHER,AZADS,MUNEEBA'
+  Actual: dbUser = 'RENAS'
+
+• Condition 2: Not Met
+  Expected: sqlText regex '\d{9,}'
+  Actual: sqlText = 'INSERT INTO SUBSCRIBERS (ID, NAME) VALUES (:1, :2)'
+
+───────────────────────────────────────────────────────────────
+Rule 2: Other
+
+Status: ✓ Matched
+Conditions: 1 of 1 Met
+
+• Condition 1: Met
+  Expected: action in 'INSERT,UPDATE,DELETE'
+  Actual: action = 'INSERT'
+
+Actions Triggered: Create Case
+
+
+╔════════════════════════════════════════════════════════════════╗
+║ TEST RESULTS - Audit Log: 9999916_133_3                       ║
+╚════════════════════════════════════════════════════════════════╝
+Audit Details: Target=DWH, DbUser=DWH_ADMIN, Owner=DWH_USER, Name=USERS, Action=DELETE
+
+───────────────────────────────────────────────────────────────
+Rule 1: Security Team
+
+Status: ✗ Not Matched
+Conditions: 0 of 2 Met
+
+• Condition 1: Not Met
+  Expected: dbUser in 'ACHATO,KVIDRESS,LALI,WAFAA,SKHALID,RENAS,AWALI,MTAHER,AZADS,MUNEEBA'
+  Actual: dbUser = 'DWH_ADMIN'
+
+  (1 condition(s) not evaluated due to short-circuit)
+
+───────────────────────────────────────────────────────────────
+Rule 2: Other
+
+Status: ✓ Matched
+Conditions: 1 of 1 Met
+
+• Condition 1: Met
+  Expected: action in 'INSERT,UPDATE,DELETE'
+  Actual: action = 'DELETE'
+
+Actions Triggered: Create Case
+
+
+╔════════════════════════════════════════════════════════════════╗
+║ TEST RESULTS - Audit Log: 9999916_133_4                       ║
+╚════════════════════════════════════════════════════════════════╝
+Audit Details: Target=DWH, DbUser=RENAS, Owner=DWH_USER, Name=SUBSCRIBERS, Action=SELECT
+
+───────────────────────────────────────────────────────────────
+Rule 1: Security Team
+
+Status: ✓ Matched
+Conditions: 2 of 2 Met
+
+• Condition 1: Met
+  Expected: dbUser in 'ACHATO,KVIDRESS,LALI,WAFAA,SKHALID,RENAS,AWALI,MTAHER,AZADS,MUNEEBA'
+  Actual: dbUser = 'RENAS'
+
+• Condition 2: Met
+  Expected: sqlText regex '\d{9,}'
+  Actual: sqlText = 'SELECT * FROM SUBSCRIBERS WHERE MSISDN = 9647508282748 AND STATUS = 'ACTIVE''
+
+JavaScript Returned Object:
+[
+  {
+    "value": "9647508282748",
+    "type": "MSISDN",
+    "tags": ["PII", "SENSITIVE"]
+  },
+  {
+    "value": "354805722283610",
+    "type": "IMEI",
+    "tags": []
+  }
+]
+
+Actions Triggered: Create Case
+
+
+╔════════════════════════════════════════════════════════════════╗
+║ TEST RESULTS - Audit Log: 9999916_133_5                       ║
+╚════════════════════════════════════════════════════════════════╝
+Audit Details: Target=DWH, DbUser=RENAS, Owner=DWH_USER, Name=SUBSCRIBERS, Action=UPDATE
+
+───────────────────────────────────────────────────────────────
+Rule 1: Security Team
+
+Status: ✗ Not Matched
+Conditions: 1 of 2 Met
+
+• Condition 1: Met
+  Expected: dbUser in 'ACHATO,KVIDRESS,LALI,WAFAA,SKHALID,RENAS,AWALI,MTAHER,AZADS,MUNEEBA'
+  Actual: dbUser = 'RENAS'
+
+• Condition 2: Not Met
+  Expected: sqlText regex '\d{9,}'
+  Actual: sqlText = 'UPDATE SUBSCRIBERS SET STATUS = 'INACTIVE' WHERE ID = 12345'
+
+───────────────────────────────────────────────────────────────
+Rule 2: Other
+
+Status: ✓ Matched
+Conditions: 1 of 1 Met
+
+• Condition 1: Met
+  Expected: action in 'INSERT,UPDATE,DELETE'
+  Actual: action = 'UPDATE'
+
+Actions Triggered: Create Case

@@ -62,11 +62,12 @@ public class RulesEngineRepository : IRulesEngineRepository
                 {
                     try
                     {
-                        rule.Conditions = JsonSerializer.Deserialize<List<RuleCondition>>(conditionsJson) ?? new List<RuleCondition>();
+                        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                        rule.Conditions = JsonSerializer.Deserialize<List<RuleCondition>>(conditionsJson, options) ?? new List<RuleCondition>();
                     }
                     catch (JsonException ex)
                     {
-                        _logger.LogWarning(ex, "Failed to parse CONDITIONS for rule {RuleId}", rule.Id);
+                        _logger.LogWarning(ex, "Failed to parse CONDITIONS for rule {RuleId}: {Json}", rule.Id, conditionsJson);
                         rule.Conditions = new List<RuleCondition>();
                     }
                 }
@@ -77,11 +78,12 @@ public class RulesEngineRepository : IRulesEngineRepository
                 {
                     try
                     {
-                        rule.Actions = JsonSerializer.Deserialize<RuleActions>(actionsJson) ?? new RuleActions();
+                        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                        rule.Actions = JsonSerializer.Deserialize<RuleActions>(actionsJson, options) ?? new RuleActions();
                     }
                     catch (JsonException ex)
                     {
-                        _logger.LogWarning(ex, "Failed to parse ACTIONS for rule {RuleId}", rule.Id);
+                        _logger.LogWarning(ex, "Failed to parse ACTIONS for rule {RuleId}: {Json}", rule.Id, actionsJson);
                         rule.Actions = new RuleActions();
                     }
                 }
